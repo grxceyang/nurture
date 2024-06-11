@@ -2,7 +2,13 @@
   "expo": {
     "name": "nurture",
     "slug": "nurture",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "android": {
+      "package": "com.graceyang.nurture"
+    },
+    "ios": {
+      "bundleIdentifier": "com.graceyang.nurture"
+    }
   },
   "name": "nurture"
 }
