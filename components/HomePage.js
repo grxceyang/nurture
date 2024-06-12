@@ -2,24 +2,26 @@ import React, { useState } from 'react';
 import { Text, View, StyleSheet, TouchableOpacity, TextInput, FlatList, ScrollView } from 'react-native';
 
 function HomeScreen() {
+  // goal input variables
   const [goals, setGoals] = useState([]);
   const [goalInputs, setGoalInputs] = useState(['']);
 
-  const handleGoalChange = (text, index) => {
-    const newGoalInputs = [...goalInputs];
-    newGoalInputs[index] = text;
-    setGoalInputs(newGoalInputs);
+  const handleGoalChange = (text, index) => { // text is the user input, index
+    const newGoalInputs = [...goalInputs]; // new array of goal inputs 
+    newGoalInputs[index] = text;  // adds new goal input to the array
+    setGoalInputs(newGoalInputs); // sets updated array with new goal input to goal inputs variable
   };
 
   const handleGoalAction = (index) => {
-    const goal = goalInputs[index];
-    if (goal.trim()) {
-      setGoals([...goals, goal]);
-      const newGoalInputs = goalInputs.filter((_, i) => i !== index);
+    const goal = goalInputs[index]; // sets goal variable to the newly inputted goal in goalinputs
+    if (goal.trim()) { // checks if goal is empty
+      setGoals([...goals, goal]); // adds the goal to the list of official goals 
+      const newGoalInputs = goalInputs.filter((_, i) => i !== index); // 'filter' used to remove current whitespace in goal box 
+      // updates the goal box with the new goal input, and adds it to goals list
       setGoalInputs(newGoalInputs.length ? newGoalInputs : ['']);
     } else {
-      setGoalInputs([...goalInputs, '']);
-    }
+      setGoalInputs([...goalInputs, '']); // if goal input is empty, just adds an empty goal box
+    } 
   };
 
   const removeGoal = (index) => {
