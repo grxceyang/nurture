@@ -1,7 +1,9 @@
 import React from 'react';
 import { View, StyleSheet, Text } from 'react-native';
+import {useValue} from './ValueContext';
 
 function ProfileScreen() {
+  const {currentValue} = useValue();
   return (
     <View style={styles.pageContainer}>
       <Text style={styles.aboutSection}>
@@ -11,10 +13,10 @@ function ProfileScreen() {
         This page may also have long-term target goals or motivational quotes for the user. 
       </Text>
       <Text style={styles.usernameSection}>
-        USERNAME
+        Username: {currentValue['username']}
       </Text>
       <Text style={styles.passwordSection}>
-        PASSWORD
+        Password: {currentValue['password']}
       </Text>
     </View>
   );
