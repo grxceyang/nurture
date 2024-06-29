@@ -8,13 +8,13 @@ function SettingsScreen() {
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Text>Settings</Text>
         <TextInput 
-            placeholder="            username"
+            placeholder="username"
             onChangeText={(text) => {
                 setCurrentValue({...currentValue, username: text});
             }}
         />
         <TextInput 
-            placeholder="            password"
+            placeholder="password"
             onChangeText={(text) => {
                 setCurrentValue({...currentValue, password: text});
             }}

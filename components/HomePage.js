@@ -1,31 +1,67 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, TouchableOpacity, TextInput, FlatList, ScrollView } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-function HomeScreen() {
-  // goal input variables
+
+const storageKey = '@goals:list';
+
+function HomePage() {
+  // State variables
   const [goals, setGoals] = useState([]);
-  const [goalInputs, setGoalInputs] = useState(['']);
+  const [goalInput, setGoalInput] = useState('');
 
-  const handleGoalChange = (text, index) => { // text is the user input, index
-    const newGoalInputs = [...goalInputs]; // new array of goal inputs 
-    newGoalInputs[index] = text;  // adds new goal input to the array
-    setGoalInputs(newGoalInputs); // sets updated array with new goal input to goal inputs variable
+  // Fetch data on component mount
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const getData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem(storageKey);
+      if (jsonValue !== null) {
+        setGoals(JSON.parse(jsonValue));
+      }
+    } catch (e) {
+      console.log('Error reading data from AsyncStorage:', e);
+    }
   };
 
-  const handleGoalAction = (index) => {
-    const goal = goalInputs[index]; // sets goal variable to the newly inputted goal in goalinputs
-    if (goal.trim()) { // checks if goal is empty
-      setGoals([...goals, goal]); // adds the goal to the list of official goals 
-      const newGoalInputs = goalInputs.filter((_, i) => i !== index); // 'filter' used to remove current whitespace in goal box 
-      // updates the goal box with the new goal input, and adds it to goals list
-      setGoalInputs(newGoalInputs.length ? newGoalInputs : ['']);
-    } else {
-      setGoalInputs([...goalInputs, '']); // if goal input is empty, just adds an empty goal box
-    } 
+  const storeData = async (value) => {
+    try {
+      await AsyncStorage.setItem(storageKey, JSON.stringify(value));
+      console.log('Data stored successfully:', JSON.stringify(value));
+    } catch (e) {
+      console.log('Error storing data in AsyncStorage:', e);
+    }
+  };
+
+  const clearAll = async () => {
+    try {
+      await AsyncStorage.removeItem(storageKey);
+      console.log('Data cleared successfully');
+      setGoals([]);
+    } catch (e) {
+      console.log('Error clearing data from AsyncStorage:', e);
+    }
+  };
+
+  const handleGoalChange = (text) => {
+    setGoalInput(text);
+  };
+
+  const handleGoalAction = () => {
+    if (goalInput.trim()) {
+      const newGoals = [...goals, goalInput];
+      setGoals(newGoals);
+      storeData(newGoals);
+      setGoalInput('');
+    }
   };
 
   const removeGoal = (index) => {
-    setGoals(goals.filter((_, i) => i !== index));
+    const updatedGoals = goals.filter((_, i) => i !== index);
+    setGoals(updatedGoals);
+    storeData(updatedGoals);
   };
 
   return (
@@ -45,25 +81,23 @@ function HomeScreen() {
           )}
           keyExtractor={(item, index) => index.toString()}
         />
-        {goalInputs.map((input, index) => (
-          <View key={index} style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter a new goal"
-              value={input}
-              onChangeText={(text) => handleGoalChange(text, index)}
-              onSubmitEditing={() => handleGoalAction(index)}
-            />
-          </View>
-        ))}
-        <TouchableOpacity style={styles.addButton} onPress={() => handleGoalAction(goalInputs.length - 1)}>
-          <Text style={styles.addButtonText}>+</Text>
-        </TouchableOpacity>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter a new goal"
+            value={goalInput}
+            onChangeText={handleGoalChange}
+            onSubmitEditing={handleGoalAction}
+          />
+          <TouchableOpacity style={styles.addButton} onPress={handleGoalAction}>
+            <Text style={styles.addButtonText}>+</Text>
+          </TouchableOpacity>
+        </View>
       </View>
       <TouchableOpacity style={styles.PomodoroButton}>
         <Text style={styles.PomodoroButtonText}>POMODORO TIMER</Text>
       </TouchableOpacity>
-      <Text style={styles.productiveSessionText}> Start a Productive Session Now! </Text>
+      <Text style={styles.productiveSessionText}>Start a Productive Session Now!</Text>
       <Text>ABOUT SECTION: This is the main Home Page that will contain the goal list and pomodoro timer button.</Text>
       <Text>The user can add new goals and then mark them as done, which will make the plants in their garden grow.</Text>
       <Text>When the pink pomodoro button is clicked, it will navigate you to the pomodoro page where the user can do pomodoro sessions.</Text>
@@ -75,7 +109,7 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 20,
-    backgroundColor: '#f5f5f5'
+    backgroundColor: '#f5f5f5',
   },
   welcomeText: {
     fontSize: 30,
@@ -84,12 +118,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   goalsContainer: {
-    width: '100%',
     padding: 20,
     borderRadius: 10,
     backgroundColor: '#fff',
     marginTop: 10,
-    alignSelf: 'center',
   },
   goalsHeader: {
     fontSize: 24,
@@ -135,9 +167,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'palevioletred',
     justifyContent: 'center',
     alignItems: 'center',
-    alignSelf: 'center',
-    marginTop: 15,
-    marginBottom: 10,
+    marginLeft: 10,
   },
   addButtonText: {
     fontSize: 24,
@@ -166,4 +196,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
+export default HomePage;
