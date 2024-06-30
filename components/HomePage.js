@@ -1,25 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, TouchableOpacity, TextInput, FlatList, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { useFocusEffect } from '@react-navigation/native';
 
 const storageKey = '@goals:list';
+const growthKey = '@user:growth';
 
 function HomePage() {
   // State variables
   const [goals, setGoals] = useState([]);
   const [goalInput, setGoalInput] = useState('');
+  const [growthPoints, setGrowthPoints] = useState(0);
 
   // Fetch data on component mount
-  useEffect(() => {
-    getData();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      getData();
+    }, [])
+  );
 
   const getData = async () => {
     try {
       const jsonValue = await AsyncStorage.getItem(storageKey);
       if (jsonValue !== null) {
         setGoals(JSON.parse(jsonValue));
+      }
+
+      const growthValue = await AsyncStorage.getItem(growthKey);
+      if (growthValue !== null) {
+        setGrowthPoints(parseInt(growthValue, 10));
       }
     } catch (e) {
       console.log('Error reading data from AsyncStorage:', e);
@@ -35,11 +44,23 @@ function HomePage() {
     }
   };
 
+  const storeGrowthPoints = async (points) => {
+    try {
+      await AsyncStorage.setItem(growthKey, points.toString());
+      console.log('Growth points stored successfully:', points);
+      setGrowthPoints(points);
+    } catch (e) {
+      console.log('Error storing growth points in AsyncStorage:', e);
+    }
+  };
+
   const clearAll = async () => {
     try {
       await AsyncStorage.removeItem(storageKey);
+      await AsyncStorage.removeItem(growthKey);
       console.log('Data cleared successfully');
       setGoals([]);
+      setGrowthPoints(0);
     } catch (e) {
       console.log('Error clearing data from AsyncStorage:', e);
     }
@@ -62,6 +83,17 @@ function HomePage() {
     const updatedGoals = goals.filter((_, i) => i !== index);
     setGoals(updatedGoals);
     storeData(updatedGoals);
+    updateGrowthPoints(1); // Increment growth points by 1 for completing a goal
+  };
+
+  const updateGrowthPoints = async (increment) => {
+    const updatedPoints = growthPoints + increment;
+    await storeGrowthPoints(updatedPoints);
+  };
+
+  // Assuming handlePomodoroCompletion will be called when a pomodoro session is completed
+  const handlePomodoroCompletion = () => {
+    updateGrowthPoints(1); // Increment growth points by 1 for completing a pomodoro session
   };
 
   return (
@@ -94,7 +126,7 @@ function HomePage() {
           </TouchableOpacity>
         </View>
       </View>
-      <TouchableOpacity style={styles.PomodoroButton}>
+      <TouchableOpacity style={styles.PomodoroButton} onPress={handlePomodoroCompletion}>
         <Text style={styles.PomodoroButtonText}>POMODORO TIMER</Text>
       </TouchableOpacity>
       <Text style={styles.productiveSessionText}>Start a Productive Session Now!</Text>

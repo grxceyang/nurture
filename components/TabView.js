@@ -10,7 +10,7 @@ import ValueProvider from './ValueContext';
 
 const Tab = createBottomTabNavigator();
 
-export default function App() {
+export default function TabView() {
   const data = { username: 'none', status: 'admin' };
 
   return (
