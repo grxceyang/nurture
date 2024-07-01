@@ -130,9 +130,6 @@ function HomePage({ navigation }) {
         <Text style={styles.PomodoroButtonText}>POMODORO TIMER</Text>
       </TouchableOpacity>
       <Text style={styles.productiveSessionText}>Start a Productive Session Now!</Text>
-      <Text>ABOUT SECTION: This is the main Home Page that will contain the goal list and pomodoro timer button.</Text>
-      <Text>The user can add new goals and then mark them as done, which will make the plants in their garden grow.</Text>
-      <Text>When the pink pomodoro button is clicked, it will navigate you to the pomodoro page where the user can do pomodoro sessions.</Text>
     </ScrollView>
   );
 }
