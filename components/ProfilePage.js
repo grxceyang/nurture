@@ -1,23 +1,39 @@
 import React from 'react';
-import { View, StyleSheet, Text } from 'react-native';
-import {useValue} from './ValueContext';
+import { View, StyleSheet, Text, TextInput } from 'react-native';
+import { useValue } from './ValueContext';
 
 function ProfileScreen() {
-  const {currentValue} = useValue();
+  const { currentValue, setCurrentValue } = useValue();
+
   return (
     <View style={styles.pageContainer}>
       <Text style={styles.aboutSection}>
         ABOUT SECTION: This will be the profile page, where the user's name and email are displayed.
       </Text>
       <Text style={styles.aboutSection}>
-        This page may also have long-term target goals or motivational quotes for the user. 
+        This page may also have long-term target goals or motivational quotes for the user.
       </Text>
-      <Text style={styles.usernameSection}>
-        Username: {currentValue['username']}
-      </Text>
-      <Text style={styles.passwordSection}>
-        Password: {currentValue['password']}
-      </Text>
+      <View style={styles.inputSection}>
+        <Text style={styles.label}>Username:</Text>
+        <TextInput
+          style={styles.input}
+          value={currentValue['username']}
+          onChangeText={(text) => {
+            setCurrentValue({ ...currentValue, username: text });
+          }}
+        />
+      </View>
+      <View style={styles.inputSection}>
+        <Text style={styles.label}>Password:</Text>
+        <TextInput
+          style={styles.input}
+          value={currentValue['password']}
+          secureTextEntry
+          onChangeText={(text) => {
+            setCurrentValue({ ...currentValue, password: text });
+          }}
+        />
+      </View>
     </View>
   );
 }
@@ -27,24 +43,26 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f5f5',
     padding: 20,
-    justifyContent: 'top',
-    alignItems: 'left',
   },
   aboutSection: {
     fontSize: 14,
+    marginBottom: 10,
   },
-  usernameSection: {
-    alignItems: 'center',
-    marginTop: 150,
-    fontSize: 15,
-  },
-  passwordSection: {
-    alignItems: 'center',
+  inputSection: {
     marginTop: 20,
+  },
+  label: {
     fontSize: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
-  }
+    marginBottom: 5,
+  },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+    backgroundColor: '#fff',
+  },
 });
 
 export default ProfileScreen;

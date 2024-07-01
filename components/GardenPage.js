@@ -15,12 +15,13 @@ const growthKey = '@user:growth';
 function GardenPage() {
   const [growthPoints, setGrowthPoints] = useState(0);
   const isFocused = useIsFocused();
+  const [refresh, setRefresh] = useState(false); // State to trigger re-render
 
   useEffect(() => {
     if (isFocused) {
       getGrowthPoints();
     }
-  }, [isFocused]);
+  }, [isFocused, refresh]); // Adding refresh as a dependency
 
   const getGrowthPoints = async () => {
     try {
@@ -56,6 +57,7 @@ function GardenPage() {
     try {
       await AsyncStorage.removeItem(growthKey);
       setGrowthPoints(0);
+      setRefresh(prev => !prev); // Toggle refresh state to trigger re-render
     } catch (e) {
       console.log('Error clearing growth points from AsyncStorage:', e);
     }
@@ -65,12 +67,6 @@ function GardenPage() {
 
   return (
     <View style={styles.pageContainer}>
-      <Text style={styles.aboutSection}>
-        ABOUT SECTION: This page contains shelves for the plants in the user's garden to grow.
-      </Text>
-      <Text style={styles.aboutSection}>
-        As the user completes more goals and more pomodoro sessions, the user's plants will grow more and be able to unlock new plant varieties.
-      </Text>
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.clearButton} onPress={clearGrowthPoints}>
           <Text style={styles.clearButtonText}>Clear Plants</Text>
@@ -102,10 +98,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
     padding: 20,
   },
-  aboutSection: {
-    fontSize: 14,
-    marginBottom: 10, // Add margin to separate from shelves
-  },
   container: {
     flexGrow: 1,
     alignItems: 'center',
@@ -113,7 +105,7 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   topSpacer: {
-    height: 100, // Add space at the top to prevent overlap
+    height: 20, // Add space at the top to prevent overlap
   },
   shelfContainer: {
     flexDirection: 'row',
@@ -121,7 +113,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end', // Align items to the bottom of the shelf
     marginVertical: 35, // Adjust vertical margin to create space between shelves
     position: 'relative', // Ensure relative positioning for absolute positioning of plantImage
-    height: 180, // Ensure enough height to contain the plant images
+    height: 130, // Ensure enough height to contain the plant images
   },
   shelf: {
     width: 300,
