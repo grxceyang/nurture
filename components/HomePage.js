@@ -126,7 +126,7 @@ function HomePage({ navigation }) {
           </TouchableOpacity>
         </View>
       </View>
-      <TouchableOpacity style={styles.PomodoroButton} onPress={() => navigation.navigate('Pomodoros')}>
+      <TouchableOpacity style={styles.PomodoroButton} onPress={() => navigation.navigate('Pomodoro Timer')}>
         <Text style={styles.PomodoroButtonText}>POMODORO TIMER</Text>
       </TouchableOpacity>
       <Text style={styles.productiveSessionText}>Start a Productive Session Now!</Text>

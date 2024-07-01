@@ -13,7 +13,7 @@ function HomePageStack() {
           component={HomePage} 
           options={{ headerShown: false }} // Disable the header for the HomePage
         />
-        <Stack.Screen name="Pomodoros" component={PomodoroScreen} options={{ presentation: 'modal' }} />
+        <Stack.Screen name="Pomodoro Timer" component={PomodoroScreen} options={{ presentation: 'modal' }} />
       </Stack.Navigator>
     );
   }

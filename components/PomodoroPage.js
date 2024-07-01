@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Button, StyleSheet, Text } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const growthKey = '@user:growth';
 
 const PomodoroScreen = () => {
-  const navigation = useNavigation();
   const [seconds, setSeconds] = useState(1500); // 25 minutes in seconds
+  const [breakSeconds, setBreakSeconds] = useState(300); // 5 minutes in seconds
   const [isActive, setIsActive] = useState(false);
+  const [isBreakActive, setIsBreakActive] = useState(false);
   const intervalRef = useRef(null);
 
   useEffect(() => {
@@ -13,20 +16,51 @@ const PomodoroScreen = () => {
       intervalRef.current = setInterval(() => {
         setSeconds((seconds) => seconds - 1);
       }, 1000);
-    } else if (!isActive && seconds !== 0) {
+    } else if (isBreakActive) {
+      intervalRef.current = setInterval(() => {
+        setBreakSeconds((breakSeconds) => breakSeconds - 1);
+      }, 1000);
+    } else {
       clearInterval(intervalRef.current);
     }
 
+    if (seconds === 0 && isActive) {
+      setIsActive(false);
+      setIsBreakActive(true);
+    }
+
+    if (breakSeconds === 0 && isBreakActive) {
+      setIsBreakActive(false);
+      setSeconds(1500);
+      setBreakSeconds(300);
+      updateGrowthPoints(2); // Increment growth points by 2 for completing a pomodoro session
+    }
+
     return () => clearInterval(intervalRef.current);
-  }, [isActive, seconds]);
+  }, [isActive, isBreakActive, seconds, breakSeconds]);
 
   const toggle = () => {
     setIsActive(!isActive);
+    setIsBreakActive(false);
   };
 
   const reset = () => {
     setSeconds(1500);
+    setBreakSeconds(300);
     setIsActive(false);
+    setIsBreakActive(false);
+  };
+
+  const updateGrowthPoints = async (increment) => {
+    try {
+      const growthValue = await AsyncStorage.getItem(growthKey);
+      const currentGrowthPoints = growthValue ? parseInt(growthValue, 10) : 0;
+      const updatedPoints = currentGrowthPoints + increment;
+      await AsyncStorage.setItem(growthKey, updatedPoints.toString());
+      console.log('Growth points updated:', updatedPoints);
+    } catch (e) {
+      console.log('Error updating growth points:', e);
+    }
   };
 
   const formatTime = (secs) => {
@@ -37,13 +71,19 @@ const PomodoroScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.headerText}>Pomodoro Timer</Text>
-      <Text style={styles.timerText}>{formatTime(seconds)}</Text>
-      <View style={styles.buttonContainer}>
-        <Button title={isActive ? "Pause" : "Start"} onPress={toggle} />
-        <Button title="Reset" onPress={reset} />
+      <View style={styles.timerContainer}>
+        <Text style={styles.headerText}>Pomodoro Timer</Text>
+        <Text style={styles.timerText}>{formatTime(seconds)}</Text>
+        <Text style={styles.timerLabel}>{isBreakActive ? "Break Time" : "Work Time"}</Text>
       </View>
-      <Button title="Close" onPress={() => navigation.goBack()} />
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={toggle}>
+          <Text style={styles.buttonText}>{isActive || isBreakActive ? "Pause" : "Start"}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={reset}>
+          <Text style={styles.buttonText}>Reset</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -57,23 +97,46 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     padding: 20,
   },
+  timerContainer: {
+    backgroundColor: 'white',
+    borderRadius: 40,
+    padding: 20,
+    alignItems: 'center',
+    marginBottom: 20,
+    width: '30%',
+    alignSelf: 'center',
+  },
   headerText: {
     textAlign: 'center',
     fontSize: 32,
     padding: 10,
-    color: 'blue',
-    marginBottom: 20,
+    color: 'palevioletred',
   },
   timerText: {
     textAlign: 'center',
     fontSize: 48,
     color: 'black',
-    marginBottom: 20,
+  },
+  timerLabel: {
+    textAlign: 'center',
+    fontSize: 24,
+    color: 'grey',
+    marginTop: 5,
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginBottom: 20,
+  },
+  button: {
+    backgroundColor: 'pink',
+    padding: 10,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 
