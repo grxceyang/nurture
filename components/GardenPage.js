@@ -21,7 +21,7 @@ function GardenPage() {
     if (isFocused) {
       getGrowthPoints();
     }
-  }, [isFocused, refresh]); // Adding refresh as a dependency
+  }, [isFocused, refresh]); 
 
   const getGrowthPoints = async () => {
     try {
