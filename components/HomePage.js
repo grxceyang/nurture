@@ -6,7 +6,7 @@ import { useFocusEffect } from '@react-navigation/native';
 const storageKey = '@goals:list';
 const growthKey = '@user:growth';
 
-function HomePage() {
+function HomePage({ navigation }) {
   // State variables
   const [goals, setGoals] = useState([]);
   const [goalInput, setGoalInput] = useState('');
@@ -126,7 +126,7 @@ function HomePage() {
           </TouchableOpacity>
         </View>
       </View>
-      <TouchableOpacity style={styles.PomodoroButton} onPress={handlePomodoroCompletion}>
+      <TouchableOpacity style={styles.PomodoroButton} onPress={() => navigation.navigate('Pomodoros')}>
         <Text style={styles.PomodoroButtonText}>POMODORO TIMER</Text>
       </TouchableOpacity>
       <Text style={styles.productiveSessionText}>Start a Productive Session Now!</Text>
