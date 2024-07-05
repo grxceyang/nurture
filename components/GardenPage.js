@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, Text, Image, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ScrollView, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useIsFocused } from '@react-navigation/native';
 
@@ -21,7 +21,7 @@ function GardenPage() {
     if (isFocused) {
       getGrowthPoints();
     }
-  }, [isFocused, refresh]); 
+  }, [isFocused, refresh]);
 
   const getGrowthPoints = async () => {
     try {
@@ -53,25 +53,10 @@ function GardenPage() {
     return plants;
   };
 
-  const clearGrowthPoints = async () => {
-    try {
-      await AsyncStorage.removeItem(growthKey);
-      setGrowthPoints(0);
-      setRefresh(prev => !prev); // Toggle refresh state to trigger re-render
-    } catch (e) {
-      console.log('Error clearing growth points from AsyncStorage:', e);
-    }
-  };
-
   const plantStages = calculatePlantStages();
 
   return (
     <View style={styles.pageContainer}>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.clearButton} onPress={clearGrowthPoints}>
-          <Text style={styles.clearButtonText}>Clear Plants</Text>
-        </TouchableOpacity>
-      </View>
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.topSpacer} />
         {[...Array(5)].map((_, shelfIndex) => (
@@ -135,22 +120,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'contain',
-  },
-  buttonContainer: {
-    alignItems: 'flex-end', // Align the button to the right
-    width: '100%',
-  },
-  clearButton: {
-    backgroundColor: 'red',
-    padding: 10,
-    borderRadius: 5,
-    marginVertical: 10,
-    width: 150, // Set a fixed width for the button
-  },
-  clearButtonText: {
-    color: 'white',
-    textAlign: 'center',
-    fontWeight: 'bold',
   },
 });
 
